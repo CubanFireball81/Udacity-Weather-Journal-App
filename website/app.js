@@ -17,11 +17,20 @@ let d = new Date();
 let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 console.log(d);
 
+// check DOM is loaded first, before JavaScript functions
+document.addEventListener("DOMContentLoaded", () => {
+    generateBTN();
+});
+
+
 // Event Listener for click on Generate button
-document.getElementById('generate').addEventListener('click', doStuff);
+const generateBTN = () => {
+    const generateButton = document.getElementById('generate');
+    generateButton.addEventListener('click', weatherData);
+}
 
 // Function called by event listener
-function doStuff (e) {
+function weatherData (e) {
     zipCode = document.getElementById('zip').value;
     getAPI(weatherURL, zipCode, apiKey);
 }

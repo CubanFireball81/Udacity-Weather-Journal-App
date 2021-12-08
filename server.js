@@ -29,12 +29,12 @@ app.use(express.static('website'));
 const port = 8000;
 const server = app.listen(port, () => {console.log(`running on localhost: ${port}`)});
 
-// Return all the data for the get route
+// Return data for the get route
 app.get("/all", (request, response) => {
     response.send(projectData);
 });
 
-// Add all data to the project for the post route
+// Add data to projectData for the post route also handle empty date and temp errors
 app.post("/add", (request, response) => {
 
     // Throw error if temp is empty
