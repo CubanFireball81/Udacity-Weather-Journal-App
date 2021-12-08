@@ -2,7 +2,7 @@
 let projectData = {
     temp: "",
     date: "",
-    userFeelings: ""
+    feelings: ""
 };
 
 // Require Express to run server and routes
@@ -49,5 +49,5 @@ app.post("/add", (request, response) => {
 
     projectData["temp"] = request.body.temp;
     projectData["date"] = request.body.date;
-    projectData["userFeelings"] = request.body.userFeelings;
+    projectData["feelings"] = request.body.feelings;
 });
