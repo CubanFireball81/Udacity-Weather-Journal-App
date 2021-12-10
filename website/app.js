@@ -5,7 +5,7 @@ const weatherURL = 'http://api.openweathermap.org/data/2.5/weather?zip=';
 // Personal API Key for OpenWeatherMap API
 const apiKey = '&appid=d3ef38a43f231726976dc66febc96243&units=imperial';
 
-// Get the current date
+// Get the current date, ensure to get the current month by adding "+1"
 let d = new Date();
 let newDate = d.getMonth() + 1 + '.' + d.getDate() + '.' + d.getFullYear();
 
