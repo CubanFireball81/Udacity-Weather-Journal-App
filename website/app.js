@@ -53,7 +53,7 @@ const getWeather = async (weatherURL, userZip, apiKey) => {
 const postData = async (url = '', data = {}) => {
 
   // Specify type of request POST and Content-Type
-  const response = await fetch(url, {
+  const res = await fetch(url, {
     method: "POST",
     credentials: "same-origin",
     headers: {
@@ -66,14 +66,13 @@ const postData = async (url = '', data = {}) => {
 
     // Try to POST data but if there is an error, console.log  error details
     try {
-      const newData = await response.json();
+      const newData = await res.json();
       return newData;
     }
     catch (error) {
       console.log(error);
     }
 };
-
 
 // Update DOM elements with dynamic data from GET/POST requests along with user entered data.
 const refreshUI = async () => {
