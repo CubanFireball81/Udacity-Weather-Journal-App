@@ -7,7 +7,7 @@ const apiKey = '&appid=d3ef38a43f231726976dc66febc96243&units=imperial';
 
 // Get the current date
 let d = new Date();
-let newDate = d.getMonth() + '.' + d.getDate() + '.' + d.getFullYear();
+let newDate = d.getMonth() + 1 + '.' + d.getDate() + '.' + d.getFullYear();
 
 // "Generate" Button Event listener
 document.getElementById('generate').addEventListener('click', performAction);
