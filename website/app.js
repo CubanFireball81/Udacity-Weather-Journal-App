@@ -1,129 +1,92 @@
 /* Global Variables */
-// API URL and API key with Unit set to Imperial
-const weatherURL = 'http://api.openweathermap.org/data/2.5/weather';
-const apiKey = 'd3ef38a43f231726976dc66febc96243&units=imperial';
+// URL for OpenWeatherMap API
+const weatherURL = 'http://api.openweathermap.org/data/2.5/weather?zip=';
 
-// Local Server URL to send POST requests to
-const serverURL = 'http://localhost:8000';
+// Personal API Key for OpenWeatherMap API
+const apiKey = '&appid=d3ef38a43f231726976dc66febc96243&units=imperial';
 
-// URL to POST to server-side
-const postURL = `${serverURL}/add`;
+// Get the current date
+let d = new Date();
+let newDate = d.getMonth() + '.' + d.getDate() + '.' + d.getFullYear();
 
-// Default options for making a request
-let options = {
-    method: "",
-    credentials: "same-origin",
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: "",
-};
+// "Generate" Button Event listener
+document.getElementById('generate').addEventListener('click', performAction);
 
-// Variable to keep temp data
-let temp = document.getElementById("temp");
+// Function called by the event listener
+function performAction(e) {
+  e.preventDefault();
 
-// User input for feelings
-let feelings = document.getElementById("content").value;
+  // Collect users input
+  const userZip = document.getElementById('zip').value;
+  const feelings = document.getElementById('feelings').value;
 
-// Formatted Date
-let date = document.getElementById("date");
+  getWeather(weatherURL, userZip, apiKey)
+    .then(function (userData) {
 
-// check DOM is loaded first, before JavaScript functions
-document.addEventListener("DOMContentLoaded", () => {
-    generateBTN();
-});
+      // POST the collected data
+      postData('/add', { date: newDate, temp: userData.main.temp, feelings })
+    }).then(function (newData) {
 
-// Event Listener for click on Generate button
-const generateBTN = () => {
-    const generateButton = document.getElementById('generate');
-    generateButton.addEventListener('click', getWeather);
+      // Update to update HTML
+      refreshUI();
+    })
 }
 
-// Function called by event listener
-const getWeather = async () => {
+// GET API data from OpenWeather
+const getWeather = async (weatherURL, userZip, apiKey) => {
 
-    // Get the zipcode entered by the user
-    let zipCode = document.getElementById("zip").value;
+  // Pass fetch() info to the res
+  const res = await fetch(weatherURL + userZip + apiKey);
+  try {
 
-  // Get the feelings content entered by the user
-    feelings = document.getElementById("feelings").value;
+    // Collect data from fetch() in json format
+    const userData = await res.json();
+    return userData;
 
-  // Dynamic URL to get data from OpenWeather API
-    const dynamicURL = `${weatherURL}?zip=${zipCode}&appid=${apiKey}`;
+    // If there is an error, console log error details
+  } catch (error) {
+    console.log("error", error);
+  }
+}
 
-  // Get weather data
-    const weatherData = await postData(dynamicURL);
+// Post data function
+const postData = async (url = '', data = {}) => {
 
-    // If valid data, store temp only in temp variable
-    if (weatherData) {
-    temp = weatherData['main'].temp;
-    }
+  // Specify type of request POST and Content-Type
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      'Content-Type': 'application/json',
+    },
 
-  // Store formatted current date
-    let d = new Date();
-    date = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
+    // Convert JSON to string so server can handle the data.
+    body: JSON.stringify(data),
+  });
 
-  // Post weather data to the server
-    postWeatherData(temp, date, feelings);
-
-  // Update the UI
-    await updateUI();
-};
-
-// Build new JS object to post to server
-const postWeatherData = async (temp, date, feelings) => {
-  // Making new object with data to be sent to the server
-    const data = {
-    temp: temp,
-    date: date,
-    feelings: feelings,
-    };
-
-    // Method of POST and Stringifying the data so the server can use it
-    options["method"] = "POST";
-    options["body"] = JSON.stringify(data);
-
-    // Post data to server using the options specified
-    await postData(postURL, options);
-};
-
-// Update DOM elements with user and weather data
-const updateUI = async () => {
+    // Try to POST data but if there is an error, console.log  error details
     try {
-    const data = await getProjectData();
-
-    if (data) {
-        date.innerHTML = `${data.date}`;
-        temp.innerHTML = `${data.temperature}`;
-        feelings.innerHTML = `${data.userResponse}`;
+      const newData = await response.json();
+      return newData;
     }
-    } catch (error) {
-        console.log("Unable to update the page: ", error);
+    catch (error) {
+      console.log(error);
     }
 };
 
-// Access projectData object from server
-const getProjectData = async () => {
 
-    // Options for GET and to remove the Body section from GET request
-    options["method"] = "GET";
-    delete options["body"];
-
-    // Get server-side data
-    const serverData = await postData(postURL, options);
-
-    // return the data
-    return serverData;
-};
-
-
-// Fetch request 
-const postData = async (url = "", options = {}) => {
-    const response = await fetch(url, options);
-    try {
-        const newData = await response.json();
-    return newData;
-    } catch (error) {
-    console.log("Something went wrong!", error);
-    }
+// Update DOM elements with dynamic data from GET/POST requests along with user entered data.
+const refreshUI = async () => {
+  const req = await fetch('/all');
+  try {
+    // Try to convert data to json, then update the DOM elements
+    const updateData = await req.json()
+    document.getElementById('date').innerHTML = updateData.date;
+    document.getElementById('temp').innerHTML = updateData.temp;
+    document.getElementById('feeling').innerHTML = updateData.feelings;
+  }
+  // If an error happens, console.log the error details
+  catch (error) {
+    console.log("error", error);
+  }
 };
